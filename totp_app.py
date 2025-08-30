@@ -22,6 +22,7 @@ class TOTPApp(QMainWindow):
         self.current_totp = None
         self.preferences_file = "preferences.json"
         self.secrets_file = "secrets.txt"
+        self.init_done = False
         
         # 设置应用程序样式
         self.setStyleSheet("""
@@ -41,6 +42,7 @@ class TOTPApp(QMainWindow):
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_totp_display)
         self.timer.start(100)  # 每100毫秒更新一次以获得更流畅的进度条
+        self.init_done = True
 
     def init_ui(self):
         # 中央部件
@@ -61,7 +63,7 @@ class TOTPApp(QMainWindow):
         self.account_combo = QComboBox()
         self.account_combo.setFont(QFont("Arial", 10))
         self.account_combo.setMinimumHeight(30)
-        self.account_combo.currentTextChanged.connect(self.on_account_select)
+        self.account_combo.currentIndexChanged.connect(self.account_changed)
         account_layout.addWidget(self.account_combo)
         
         layout.addLayout(account_layout)
@@ -200,15 +202,21 @@ class TOTPApp(QMainWindow):
                     index = self.account_combo.findText(last_account)
                     if index >= 0:
                         self.account_combo.setCurrentIndex(index)
+                        # 手动触发账户选择事件
+                        self.on_account_select(last_account)
             except Exception as e:
                 print(f"加载偏好设置时出错: {e}")
         
         # 如果没有选择任何账户，选择第一个
         if self.account_combo.currentIndex() == -1 and self.account_combo.count() > 0:
             self.account_combo.setCurrentIndex(0)
+            # 手动触发账户选择事件
+            self.on_account_select(self.account_combo.currentText())
 
     def save_preferences(self):
         """保存用户偏好设置"""
+        if not self.init_done:
+            return
         try:
             preferences = {
                 'last_account': self.account_combo.currentText()
@@ -220,7 +228,8 @@ class TOTPApp(QMainWindow):
 
     def on_account_select(self, account_name):
         """当用户选择不同账户时的处理"""
-        if not account_name:
+        # 检查 account_name 是否为 None 或空字符串
+        if not account_name or account_name == "":
             return
             
         # 查找对应的secret
@@ -228,13 +237,20 @@ class TOTPApp(QMainWindow):
             if entry['display_name'] == account_name:
                 self.current_totp = pyotp.TOTP(entry['secret'])
                 break
-                
+
         # 保存偏好
         self.save_preferences()
         
         # 立即更新TOTP显示
         self.update_totp_display()
 
+    # 添加一个新的信号处理方法来确保偏好保存
+    def account_changed(self, index):
+        """当用户选择不同账户时的处理（通过索引）"""
+        if index >= 0:
+            account_name = self.account_combo.itemText(index)
+            self.on_account_select(account_name)
+            
     def update_totp_display(self):
         """更新TOTP显示内容"""
         if not self.current_totp:
