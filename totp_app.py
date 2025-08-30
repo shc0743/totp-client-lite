@@ -291,7 +291,7 @@ class TOTPApp(QMainWindow):
     def copy_to_clipboard(self):
         """复制TOTP到剪贴板"""
         clipboard = QApplication.clipboard()
-        clipboard.setText(self.totp_entry.text())
+        clipboard.setText(self.totp_entry.toPlainText())
         
         # 显示提示信息
         self.copy_btn.setText("已复制!")
