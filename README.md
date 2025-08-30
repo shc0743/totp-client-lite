@@ -11,7 +11,7 @@ Simple TOTP (Time-based One-Time Password) Application based on PyOTP
 # How to use
 
 1. Download the code as .zip and expand it
-2. Run the `create_runtime.cmd`. By doing this, a runtime environment will be created automatically.
+2. Run the `create_runtime.cmd`. By doing this, a runtime environment will be created automatically. Reminder: You can also download the `with-runtime.zip` in Releases page so that you don't need to create the runtime manually.
 3. Put your secrets to `secrets.txt`.
 4. Run `app.cmd`.
 5. The TOTP codes will be generated automatically.
@@ -48,7 +48,7 @@ To protect your secrets, please:
 ## 使用方法
 
 1. 下载代码压缩包（.zip）并解压
-2. 运行 `create_runtime.cmd` 自动创建运行环境（首次使用需执行）
+2. 运行 `create_runtime.cmd` 自动创建运行环境（首次使用需执行）**注意**：也可以选择直接下载 `with-runtime.zip` 解压即可使用。
 3. 将您的密钥信息存入 `secrets.txt` 文件中
 4. 运行 `app.cmd` 启动应用
 5. TOTP 验证码将自动生成并显示
